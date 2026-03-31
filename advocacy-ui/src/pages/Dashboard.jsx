@@ -11,83 +11,110 @@ import { AI_MODES } from '../constants/modes';
 import NumerologyResults from '../components/Results/NumerologyResults';
 
 const Dashboard = () => {
-  //this is setting the default value of toggle mode
   const [activeMode, setActiveMode] = useState(AI_MODES.LEGAL.id);
   const [extractionData, setExtractionData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null); // Added error state
+  const [error, setError] = useState(null);
 
-  // The "Dispatcher" - Decides what UI to show based on state
   const renderResults = () => {
-    //this function return result at the end 
     if (error) return <ErrorDisplay error={error} reset={() => setError(null)} />;
     if (!extractionData && !isLoading) return <EmptyState />;
-    //agar null nhi hai and loading hai true to ye show karna hai
+    
     if (!extractionData && isLoading) return (
-       <div className="h-full flex items-center justify-center text-stone-400 italic animate-pulse">
-         Extracting intelligence...
+       <div className="h-full flex flex-col items-center justify-center space-y-4">
+         <div className="w-12 h-12 border-4 border-stone-100 border-t-indigo-600 rounded-full animate-spin" />
+         <p className="text-stone-400 font-bold text-[10px] uppercase tracking-widest">Processing Intelligence...</p>
        </div>
     );
-    //switch decides which page to show accrding to the toggle mode selected by user and each page has its own way of showing the data based on the type of data 
-    switch (activeMode) {
-      //switiching to the diffrent pages based on the toggle mode selected by user
-      //and each page has its own way of showing the data based on the type of data
-      //we are passing the json data as the prop to each page 
-      //adn they will show render the data according to their design
-      case 'legal': return <LegalResults data={extractionData} />;
-      case 'mom_test': return <MomTestResults data={extractionData} />;
-      case 'summary': return <SummaryResults data={extractionData} />;
-      case 'numerology' : return <NumerologyResults data={extractionData} />;
-      default: return <EmptyState />;
-    }
-  };
 
-  // Helper to change modes and clear old data
-  const handleModeChange = (modeId) => {
-    setActiveMode(modeId);
-    setExtractionData(null);
-    setError(null);
+    return (
+      <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+        {(() => {
+          switch (activeMode) {
+            case 'legal': return <LegalResults data={extractionData} />;
+            case 'mom_test': return <MomTestResults data={extractionData} />;
+            case 'summary': return <SummaryResults data={extractionData} />;
+            case 'numerology' : return <NumerologyResults data={extractionData} />;
+            default: return <EmptyState />;
+          }
+        })()}
+      </div>
+    );
   };
 
   return (
-    <div className="flex min-h-screen text-stone-800">
-      {/* Sidebar for Toggles */}
-      <Sidebar 
-      //we are passing the two props to. the sidebar component. currentMode tells the sidebar which toggle is currently active so it can highlight it, and onModeChange is a function that the sidebar will call when the user clicks a toggle, allowing the sidebar to communicate back to the Dashboard
-        currentMode={activeMode} 
-        //this is function defined above 
-        onModeChange={handleModeChange} 
-      />
+    // 1. Set h-screen and overflow-hidden on the wrapper
+    <div className="flex h-screen overflow-hidden bg-[#F8F8F7] text-stone-900 font-sans">
+      <Sidebar currentMode={activeMode} onModeChange={(id) => {setActiveMode(id); setExtractionData(null); setError(null);}} />
 
-      {/* Main Workspace */}
-      <main className="flex-1 p-8 overflow-y-auto">
-        <div className="max-w-6xl mx-auto space-y-8">
-          <header className="border-b border-stone-200/50 pb-6">
-            <h1 className="text-4xl font-bold tracking-tight text-stone-800">Advocacy OS <span className="text-stone-300">|</span> <span className="font-light text-stone-500">Engine</span></h1>
-            <p className="text-stone-500 mt-2 font-medium">
-              Currently Operating in: <span className="text-orange-500 uppercase tracking-widest text-xs font-bold">{activeMode}</span>
+      {/* 2. Main content area is a flex column that takes full height */}
+      <main className="flex-1 flex flex-col h-full min-w-0">
+        
+        {/* Pinned Header */}
+        <header className="px-10 py-6 border-b border-stone-200/60 bg-white/50 backdrop-blur-md flex items-center justify-between shrink-0">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-stone-900">
+              Advocacy<span className="text-indigo-600">OS</span>
+            </h1>
+            <p className="text-[10px] font-bold text-stone-400 uppercase tracking-widest mt-1">
+              Protocol: <span className="text-indigo-600">{activeMode.replace('_', ' ')}</span>
             </p>
-          </header>
+          </div>
+          <div className="flex items-center gap-4">
+             <div className="text-right">
+                <p className="text-[9px] font-bold text-stone-400 uppercase">Engine Status</p>
+                <p className="text-[10px] font-mono text-emerald-600 font-bold tracking-tighter uppercase">Operational</p>
+             </div>
+             <div className="w-8 h-8 rounded-full bg-stone-100 border border-stone-200" />
+          </div>
+        </header>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            {/* Left Column (Upload & Logs) */}
-            <div className="lg:col-span-4 space-y-6">
-              <FileUploader 
-              //we are passing three props to the file uploader. mode tells the uploader which mode is currently active so it can send that info to the backend when uploading, setExtractionData and setLoading are functions that the uploader will call to update the Dashboard's state based on the response from the backend, allowing the uploader to communicate results back to the Dashboard
-                mode={activeMode} 
-                setExtractionData={setExtractionData} 
-                setLoading={setIsLoading}
-                setError={setError} // Pass setError so uploader can trigger it
-                //now we have the response data in the dashboard component in the extractionData state variable 
-              />
-              {/* terminal log is just a loading prop is passed  */}
-               <TerminalLog loading={isLoading} />
+        {/* 3. The scrollable workspace area */}
+        <div className="flex-1 overflow-hidden p-8">
+          <div className="h-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            {/* Left Column: Fixed (Doesn't scroll unless it overflows) */}
+            <div className="lg:col-span-4 flex flex-col gap-6 h-full overflow-y-auto pr-2 custom-scrollbar">
+              <div className="bg-white border border-stone-200 p-6 rounded-[32px] shadow-sm shrink-0">
+                <FileUploader 
+                    mode={activeMode} 
+                    setExtractionData={setExtractionData} 
+                    setLoading={setIsLoading}
+                    setError={setError} 
+                />
+              </div>
+              <div className="flex-1 bg-white border border-stone-200 rounded-[32px] shadow-sm overflow-hidden flex flex-col min-h-[300px]">
+                <div className="px-5 py-3 border-b border-stone-50 bg-stone-50/50 flex items-center justify-between shrink-0">
+                    <span className="text-[9px] font-bold text-stone-400 uppercase tracking-[0.2em]">Live Process Terminal</span>
+                </div>
+                <div className="flex-1 overflow-y-auto p-4 custom-scrollbar bg-stone-100">
+                    <TerminalLog loading={isLoading} />
+                </div>
+              </div>
             </div>
 
-            {/* Right Column (Dynamic Results) */}
-            <div className="lg:col-span-8">
-              {renderResults()}
+            {/* Right Column: This is where the Results live. It scrolls internally. */}
+            <div className="lg:col-span-8 h-full flex flex-col">
+              <div className="flex-1 bg-white border border-stone-200 rounded-[40px] shadow-sm overflow-hidden flex flex-col relative">
+                {/* Decorative background grid */}
+                <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-20 pointer-events-none" />
+                
+                {/* 4. THE MAGIC SCROLL BOX */}
+                <div className="relative flex-1 overflow-y-auto p-10 custom-scrollbar scroll-smooth">
+                    {renderResults()}
+                </div>
+
+                {/* Fixed Results Footer */}
+                <div className="shrink-0 h-12 bg-stone-50/80 backdrop-blur-sm border-t border-stone-100 px-8 flex items-center justify-between">
+                    <span className="text-[9px] font-bold text-stone-300 uppercase tracking-[0.3em]">Neural Analytics v2.0</span>
+                    <div className="flex gap-4">
+                        <div className="w-2 h-2 rounded-full bg-stone-200" />
+                        <div className="w-2 h-2 rounded-full bg-stone-200" />
+                    </div>
+                </div>
+              </div>
             </div>
+
           </div>
         </div>
       </main>
