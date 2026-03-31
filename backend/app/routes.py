@@ -2,9 +2,12 @@ from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from pypdf import PdfReader
 from app.ai_engine import process_document
 
+
+#we reacted the router in a separate file to keep main.py clean
 router = APIRouter()
 
 # Notice `mode: str = Form(...)`. This matches the formData.append('mode', mode) in React!
+#when the user uploads a file and selects a mode, both the file and the mode are sent together to this endpoint. The `mode` variable will tell us which "expert" to route the text to in our AI Engine.
 @router.post("/extract")
 async def extract_clauses(file: UploadFile = File(...), mode: str = Form(...)):
     
@@ -25,10 +28,15 @@ async def extract_clauses(file: UploadFile = File(...), mode: str = Form(...)):
             raise HTTPException(status_code=400, detail="Empty PDF detected.")
 
         # 2. Send to AI Engine
+      #this is the function from the ai_engine file 
         response = process_document(text, mode)
         
         # FastAPI will automatically convert the Pydantic model to JSON
+        #response is returnned in the structured json form 
+        print(response)
+
         return response
+  
 
     except Exception as e:
         print(f"Server Error: {e}")

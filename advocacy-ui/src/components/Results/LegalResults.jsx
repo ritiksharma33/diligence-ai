@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Users, Calendar, Gavel, ShieldAlert, FileText, IndianRupee } from 'lucide-react';
-
+//prop is recieveed data in json form now render it on the ui 
 const LegalResults = ({ data }) => {
   // Animation variants for the "Staggered" entrance effect
   const containerVars = {

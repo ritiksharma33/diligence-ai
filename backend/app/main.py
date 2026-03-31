@@ -13,7 +13,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include the API routes
+# Include the API routes. This keeps our main.py clean and focused on configuration, while 
 app.include_router(router)
 
 if __name__ == "__main__":

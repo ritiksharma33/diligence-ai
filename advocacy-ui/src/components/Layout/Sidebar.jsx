@@ -1,6 +1,6 @@
 import React from 'react';
 import { AI_MODES } from '../../constants/modes';
-import { Shield, Lightbulb, FileText } from 'lucide-react';
+import { Shield, Lightbulb, FileText, Sparkles } from 'lucide-react';
 
 const Sidebar = ({ currentMode, onModeChange }) => {
   return (
@@ -25,6 +25,7 @@ const Sidebar = ({ currentMode, onModeChange }) => {
               {mode.id === 'legal' && <Shield size={18}/>}
               {mode.id === 'mom_test' && <Lightbulb size={18}/>}
               {mode.id === 'summary' && <FileText size={18}/>}
+              {mode.id === 'numerology' && <Sparkles size={18}/>}
               {mode.label}
             </button>
           );

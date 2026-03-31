@@ -16,5 +16,11 @@ export const AI_MODES = {
     label: 'Quick Summarizer',
     color: 'blue',
     description: 'Condenses complex documents into 3 bullet points.'
+  },
+  NUMEROLOGY: {
+    id: 'numerology',
+    label: 'Numerology Insights',
+    color: 'purple',
+    description: 'Provides personalized insights based on numerological analysis.'
   }
 };

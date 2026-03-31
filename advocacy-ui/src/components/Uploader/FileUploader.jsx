@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import axios from 'axios';
 import { Upload } from 'lucide-react';
 
+//it recives four prop data currenlty they are null only mode have a default value of legal
 const FileUploader = ({ mode, setExtractionData, setLoading, setError }) => {
   const fileInputRef = useRef(null);
 
@@ -16,11 +17,12 @@ const FileUploader = ({ mode, setExtractionData, setLoading, setError }) => {
 
     const formData = new FormData();
     formData.append('file', file);
-    // Send the current mode to the backend so it knows which AI Expert to use
+    // Send the current mode to the backend so it knows which AI Ex pert to use
     formData.append('mode', mode); 
-
+//posting the data on the /extract endpoint which form data have file and mode info 
     try {
       const response = await axios.post(`http://127.0.0.1:8000/extract`, formData);
+      // Set the extraction data in the parent componentchaneg it to the response data
       setExtractionData(response.data);
     } catch (err) {
       console.error("Neural Link Failure:", err);
